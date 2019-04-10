@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>London Underground</title>
+	
+<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Merienda:700" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
+  integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+  crossorigin=""/>
+<!--<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet-src.js"
+  crossorigin=""></script>-->
+<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
+  integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+  crossorigin=""></script>
+
+
+<script src="L.Polyline.SnakeAnim.js"></script>
+
+<style>
+body {
+            padding: 0;
+            margin: 0;
+        }
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+			font-family: 'Open Sans', sans-serif;
+        }
+	#year{
+			position: absolute;
+			width:200px;
+			height:110px;
+			right: 25px;
+			top: 25px;
+			font-size:1em;	
+			background:#fff;
+			padding:5px;
+			border-style: double;
+	
+	}
+	#time{
+			position: absolute;
+			left: 25px;
+			bottom: 25px;
+			font-family: 'Merienda', cursive;
+			font-size:3em;	
+			padding:5px;
+			padding-top:1px;
+			padding-bottom:1px;
+			border-style: double;
+			background-color:#fff;
+	
+	}
+	#header{
+			position: absolute;
+			width: 400px;
+			margin: auto;
+			left:30%;
+			top: 0;
+			font-size:3em;	
+			background:#000;
+			color:#fff;
+			padding-left:27px;
+			padding-top:9px;
+			padding-top:0px;
+			border-style: double;
+	}
+	#info {
+			position: fixed;
+			font-family: 'Raleway', sans-serif;
+			height:30px;
+			left: 40%;
+			bottom: 60px;
+			font-size:1.8em;
+			
+		}
+		
+		.leaflet-control-attribution {padding-bottom:17px; padding-right:18px;}
+		.leaflet-control-zoom {left: 20px; top: 20px;}
+		
+		#top, #bottom, #left, #right {
+	background: #5C8543;
+	position: fixed;
+	}
+	#left, #right {
+		top: 0; bottom: 0;
+		width: 15px;
+		}
+		#left { left: 0; }
+		#right { right: 0; }
+		
+	#top, #bottom {
+		left: 0; right: 0;
+		height: 15px;
+		}
+		#top { top: 0; }
+		#bottom { bottom: 0; }
+		
+	.myButton {
+	background-color:#5c8543;
+	-moz-border-radius:11px;
+	-webkit-border-radius:11px;
+	border-radius:11px;
+	border:1px solid #18ab29;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:17px;
+	font-weight:bold;
+	padding:7px 15px;
+	text-decoration:none;
+}
+.myButton:hover {
+	background-color:#5cbf2a;
+}
+
+	</style>
+
+</head>
+<body>
+	<div id="header" style="z-index:3";>UNDERGROUND</div>
+	<div id="left" style="z-index:2";></div>
+	<div id="right" style="z-index:2";></div>
+	<div id="top" style="z-index:2";></div>
+	<div id="bottom" style="z-index:2";></div>
+	<div id="map" style="z-index:0"; border-width:10px></div>
+	<div id="year" style="z-index:2";>The Metropolitan Line opened in 1863 with seven stations between Paddington and Farringdon.
+	 </div>
+	<div id="info" style="z-index:2";>
+    <button class="myButton" onclick="Timer.start();">Start</button>
+    <button class="myButton" onclick="Timer.stop();">Stop</button>
+    </div>
+	<div id="time" style="z-index:2";>1863</div>
+	
+
+ 
+  
+
+	<script src="route2.js"></script>
+	<script>
+		for (var i = 0, hammer = [], len = hammersmith.length; i < len; i++) {
+			hammer.push(new L.LatLng(hammersmith[i][0], hammersmith[i][1]));
+		}
+		var line = L.polyline(hammer, {color: 'red'});
+		
+		
+		for (var i = 0, latlngs = [], len = route.length; i < len; i++) {
+			latlngs.push(new L.LatLng(route[i][0], route[i][1]));
+		}
+		var path = L.polyline(latlngs, {color: 'red'});
+		
+		
+		for (var i = 0, moor = [], len = moorgate.length; i < len; i++) {
+			moor.push(new L.LatLng(moorgate[i][0], moorgate[i][1]));
+		}
+		var moorline = L.polyline(moor, {color: 'red'});
+		
+		
+		for (var i = 0, baker = [], len = bakerloo.length; i < len; i++) {
+			baker.push(new L.LatLng(bakerloo[i][0], bakerloo[i][1]));
+		}
+		var bakerline = L.polyline(baker, {color: 'red'});
+		
+		
+		for (var i = 0, dist = [], len = district.length; i < len; i++) {
+			dist.push(new L.LatLng(district[i][0], district[i][1]));
+		}
+		var districtline = L.polyline(dist, {color: 'green'});
+		
+		
+		for (var i = 0, brom = [], len = brompton.length; i < len; i++) {
+			brom.push(new L.LatLng(brompton[i][0], brompton[i][1]));
+		}
+		var bromptonline = L.polyline(brom, {color: 'green'});
+		
+		
+		for (var i = 0, black = [], len = blackfriars.length; i < len; i++) {
+			black.push(new L.LatLng(blackfriars[i][0], blackfriars[i][1]));
+		}
+		var blackfriarsline = L.polyline(black, {color: 'green'});
+		
+		
+		for (var i = 0, ken = [], len = kensington.length; i < len; i++) {
+			ken.push(new L.LatLng(kensington[i][0], kensington[i][1]));
+		}
+		var kensingtonline = L.polyline(ken, {color: 'green'});
+		
+		
+		for (var i = 0, ald = [], len = aldgate.length; i < len; i++) {
+			ald.push(new L.LatLng(aldgate[i][0], aldgate[i][1]));
+		}
+		var aldgateline = L.polyline(ald, {color: 'red'});
+		
+		
+		for (var i = 0, man = [], len = mansion.length; i < len; i++) {
+			man.push(new L.LatLng(mansion[i][0], mansion[i][1]));
+		}
+		var mansionline = L.polyline(man, {color: 'green'});
+		
+		
+		for (var i = 0, rich = [], len = richmond.length; i < len; i++) {
+			rich.push(new L.LatLng(richmond[i][0], richmond[i][1]));
+		}
+		var richmondline = L.polyline(rich, {color: 'green'});
+		
+		
+		for (var i = 0, eal = [], len = ealing.length; i < len; i++) {
+			eal.push(new L.LatLng(ealing[i][0], ealing[i][1]));
+		}
+		var ealingline = L.polyline(eal, {color: 'green'});
+		
+		
+		for (var i = 0, har = [], len = harrow.length; i < len; i++) {
+			har.push(new L.LatLng(harrow[i][0], harrow[i][1]));
+		}
+		var harrowline = L.polyline(har, {color: 'red'});
+		
+		
+		for (var i = 0, put = [], len = putney.length; i < len; i++) {
+			put.push(new L.LatLng(putney[i][0], putney[i][1]));
+		}
+		var putneyline = L.polyline(put, {color: 'green'});
+		
+		
+		for (var i = 0, tow = [], len = tower.length; i < len; i++) {
+			tow.push(new L.LatLng(tower[i][0], tower[i][1]));
+		}
+		var towerline = L.polyline(tow, {color: 'red'});
+		
+		for (var i = 0, houn = [], len = hounslow.length; i < len; i++) {
+			houn.push(new L.LatLng(hounslow[i][0], hounslow[i][1]));
+		}
+		var hounslowline = L.polyline(houn, {color: 'green'});
+		
+		for (var i = 0, circ = [], len = circle.length; i < len; i++) {
+			circ.push(new L.LatLng(circle[i][0], circle[i][1]));
+		}
+		var circleline = L.polyline(circ, {color: 'red'});
+		
+		for (var i = 0, white = [], len = whitechapel.length; i < len; i++) {
+			white.push(new L.LatLng(whitechapel[i][0], whitechapel[i][1]));
+		}
+		var whitechapelline = L.polyline(white, {color: 'green'});
+		
+		for (var i = 0, newc = [], len = newcross.length; i < len; i++) {
+			newc.push(new L.LatLng(newcross[i][0], newcross[i][1]));
+		}
+		var newcrossline = L.polyline(newc, {color: 'orange'});
+		
+		for (var i = 0, ches = [], len = chesham.length; i < len; i++) {
+			ches.push(new L.LatLng(chesham[i][0], chesham[i][1]));
+		}
+		var cheshamline = L.polyline(ches, {color: 'red'});
+		
+		for (var i = 0, wim = [], len = wimbledon.length; i < len; i++) {
+			wim.push(new L.LatLng(wimbledon[i][0], wimbledon[i][1]));
+		}
+		var wimbledonline = L.polyline(wim, {color: 'green'});
+		
+		for (var i = 0, stock = [], len = stockwell.length; i < len; i++) {
+			stock.push(new L.LatLng(stockwell[i][0], stockwell[i][1]));
+		}
+		var stockwellline = L.polyline(stock, {color: 'black'});
+		
+
+
+		var map = L.map('map', {
+				  center: [51.5072276,-0.1615504],
+  				  zoom: 12
+		});
+
+
+		var positron = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+		}).addTo(map);
+		
+		//create a layer group consisting of all lines
+		var finishedtube = L.layerGroup([line, path, moorline, bakerline, districtline, bromptonline, blackfriarsline, kensingtonline, aldgateline, mansionline, richmondline, ealingline, harrowline, putneyline, towerline, hounslowline, circleline, whitechapelline, newcrossline, cheshamline, wimbledonline, stockwellline]);
+
+		
+		
+		
+		//add lines by time
+
+		
+	var Timer = (function () {
+    var isExeced = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+    var timeout1, timeout2, timeout3, timeout4, timeout5, timeout6, timeout7, timeout8, timeout9, timeout10, timeout11, timeout12, timeout13, timeout14, timeout15, timeout16, timeout17, timeout18, timeout19, timeout20, timeout21, timeout22;
+    var startTime, costTime = 0;
+    var finished = false;
+    var status = 0;
+
+    function reset () {
+        costTime = 0;
+        status   = 0;
+        finished = false;
+        isExeced = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+    }
+
+    function desertAK () {
+		map.addLayer(path);	
+		path.snakeIn();
+		document.getElementById('year').innerHTML= "The Metropolitan Line opened in 1863 with seven stations between Paddington and Farringdon.";
+		document.getElementById('time').innerHTML= "1863" 
+    }
+
+    function fourAlarmShotgun () {
+ 		map.addLayer(line);	
+		line.snakeIn(); 
+		document.getElementById('year').innerHTML= "In 1864 the line extended down to Hammersmith.";
+		document.getElementById('time').innerHTML= "1864" 
+	}
+
+    function frostbiteAR () {
+    	map.addLayer(moorline);	
+		moorline.snakeIn(); 
+		document.getElementById('year').innerHTML= "In 1865 the line was extended eastwards to Moorgate.";
+		document.getElementById('time').innerHTML= "1865"   
+	}
+	
+	function time4 () {
+    	map.addLayer(bakerline);	
+		bakerline.snakeIn(); 
+		document.getElementById('year').innerHTML= "In 1868 the line was extended northwards for the first time from Baker Street to Swiss Cottage.";
+		document.getElementById('time').innerHTML= "1868" 
+  	}
+	
+	function time5 () {
+    	map.addLayer(districtline);	
+		districtline.snakeIn(); 
+		document.getElementById('year').innerHTML= "In 1868 the District line was also opened from South Kensington to Westminster.";
+		document.getElementById('time').innerHTML= "1868" 
+  	}
+	
+	function time6 () {
+    	map.addLayer(bromptonline);	
+		bromptonline.snakeIn(); 
+		document.getElementById('year').innerHTML= "In 1869 the District line was extended eastwards to Blackriars and west to West Brompton.";
+		document.getElementById('time').innerHTML= "1869" 
+  	}
+	
+	function time7 () {
+		map.addLayer(blackfriarsline);	
+		blackfriarsline.snakeIn();  	
+	}
+	
+	function time8 () {
+    	map.addLayer(kensingtonline);	
+		kensingtonline.snakeIn(); 
+		document.getElementById('year').innerHTML= "In 1871 Earls Court Station was opened and the District line was extended from High Street Kensington to West Brompton.";
+		document.getElementById('time').innerHTML= "1871" 
+  	}
+	
+	function time9 () { 
+			map.addLayer(aldgateline);	
+			aldgateline.snakeIn(); 
+			document.getElementById('year').innerHTML= "In 1871 the Metropolitan line was extended even further east to Aldgate.";
+	}
+			
+			function time10 () { 
+			map.addLayer(mansionline);	
+			mansionline.snakeIn(); 
+			document.getElementById('year').innerHTML= "In 1875 the District line was extended east to Mansion House.";
+			document.getElementById('time').innerHTML= "1875" 
+			}
+			
+			function time11 () { 
+			map.addLayer(richmondline);	
+			richmondline.snakeIn(); 
+			document.getElementById('year').innerHTML= "In 1877 both the District line and the Metropolitan line extended south to Richmond.";
+			document.getElementById('time').innerHTML= "1877" 
+			}
+			
+			function time12 () { 
+			map.addLayer(ealingline);	
+			ealingline.snakeIn(); 
+			document.getElementById('year').innerHTML= "In 1878 the District line extended west to Ealing Broadway.";
+			document.getElementById('time').innerHTML= "1878" 
+			}
+			
+			function time13 () { 
+			map.addLayer(harrowline);	
+			harrowline.snakeIn(); 
+			document.getElementById('year').innerHTML= "In 1880 the Metropolitan line extended even further north to Harrow on the Hill.";
+			document.getElementById('time').innerHTML= "1880" 
+			}
+			
+			function time14 () { 
+			map.addLayer(putneyline);	
+			putneyline.snakeIn(); 
+			document.getElementById('year').innerHTML= "In 1880 the District line was also extended down to Putney.";
+			}
+			
+			function time15 () { 
+			map.addLayer(towerline);	
+			towerline.snakeIn(); 
+			document.getElementById('year').innerHTML= "In 1883 the Metropolitan line was extended around to Tower Hill.";
+			document.getElementById('time').innerHTML= "1883" 
+			}
+			
+			function time16 () { 
+			map.addLayer(hounslowline);	
+			hounslowline.snakeIn(); 
+			document.getElementById('year').innerHTML= "The District line was also extended in 1883, down to Hounslow."
+			}
+			
+			function time17 () { 
+			map.addLayer(circleline);	
+			circleline.snakeIn(); 
+			document.getElementById('year').innerHTML= "The Metropolitan line was extended in 1884 to join the District Line at Mansion House.";
+			document.getElementById('time').innerHTML= "1884" 
+			}
+			
+			function time18 () { 
+			map.addLayer(whitechapelline);	
+			whitechapelline.snakeIn(); 
+			document.getElementById('year').innerHTML= "In 1884 the District line also extended to Whitechapel."
+			}
+			
+			function time19 () { 
+			map.addLayer(newcrossline);	
+			newcrossline.snakeIn(); 
+			document.getElementById('year').innerHTML= "The Metropolitan line also extended in 1884 to New Cross in the south."
+			}
+			
+			function time20 () { 
+			map.addLayer(cheshamline);	
+			cheshamline.snakeIn(); 
+			document.getElementById('year').innerHTML= "By 1889 the Metropolitan line had extended as far as Chesham in the north.";
+			document.getElementById('time').innerHTML= "1889" 
+			}
+			
+			function time21 () { 
+			map.addLayer(wimbledonline);	
+			wimbledonline.snakeIn(); 
+			document.getElementById('year').innerHTML= "In 1889 the District line was extended south to Wimbledon."
+			}
+			
+			function time22 () { 
+			map.addLayer(stockwellline);	
+			stockwellline.snakeIn(); 
+			document.getElementById('year').innerHTML= "In 1890 what would become the Northern line was built from Stockwell to King William Street.";
+			document.getElementById('time').innerHTML= "1890";
+			document.getElementById('info').innerHTML= "<button class=\"myButton\" onclick='removeAll()'>Reset</button>"
+			}
+
+
+    function timedText () {
+        if (finished) {
+            return resume();
+        }
+
+        if (status === 1) {
+            return;
+        } else {
+            status = 1;
+        }
+
+        startTime = +new Date();
+        
+        if (isExeced[0]) {
+            timeout1 = setTimeout(function () {
+                isExeced[0] = 0;
+                desertAK();
+            }, 10 - costTime);
+        }
+
+        if (isExeced[1]) {
+            timeout2 = setTimeout(function () {
+                isExeced[1] = 0;
+                fourAlarmShotgun();
+            }, 5000 - costTime);
+        }
+
+        if (isExeced[2]) {
+            timeout3 = setTimeout(function () {
+                isExeced[2] = 0;
+                frostbiteAR();
+            }, 7500 - costTime);
+        }
+		
+		if (isExeced[3]) {
+            timeout4 = setTimeout(function () {
+                isExeced[3] = 0;
+                time4();
+            }, 10000 - costTime);
+        }
+		
+		if (isExeced[4]) {
+            timeout5 = setTimeout(function () {
+                isExeced[4] = 0;
+                time5();
+            }, 12500 - costTime);
+        }
+		
+		if (isExeced[5]) {
+            timeout6 = setTimeout(function () {
+                isExeced[5] = 0;
+                time6();
+            }, 15000 - costTime);
+        }
+		
+		if (isExeced[6]) {
+            timeout7 = setTimeout(function () {
+                isExeced[6] = 0;
+                time7();
+            }, 15000 - costTime);
+        }
+		if (isExeced[7]) {
+            timeout8 = setTimeout(function () {
+                isExeced[7] = 0;
+                time8();
+            }, 17500 - costTime);
+        }
+		if (isExeced[8]) {
+            timeout9 = setTimeout(function () {
+                isExeced[8] = 0;
+                time9();
+            }, 20000 - costTime);
+        }
+		if (isExeced[9]) {
+            timeout10 = setTimeout(function () {
+                isExeced[9] = 0;
+                time10();
+            }, 22500 - costTime);
+        }
+		if (isExeced[10]) {
+            timeout11 = setTimeout(function () {
+                isExeced[10] = 0;
+                time11();
+            }, 25000 - costTime);
+        }
+		if (isExeced[11]) {
+            timeout12 = setTimeout(function () {
+                isExeced[11] = 0;
+                time12();
+            }, 27500 - costTime);
+        }
+		if (isExeced[12]) {
+            timeout13 = setTimeout(function () {
+                isExeced[12] = 0;
+                time13();
+            }, 30000 - costTime);
+        }
+		if (isExeced[13]) {
+            timeout14 = setTimeout(function () {
+                isExeced[13] = 0;
+                time14();
+            }, 32500 - costTime);
+        }
+		if (isExeced[14]) {
+            timeout15 = setTimeout(function () {
+                isExeced[14] = 0;
+                time15();
+            }, 35000 - costTime);
+        }
+		if (isExeced[15]) {
+            timeout16 = setTimeout(function () {
+                isExeced[15] = 0;
+                time16();
+            }, 37500 - costTime);
+        }
+		if (isExeced[16]) {
+            timeout17 = setTimeout(function () {
+                isExeced[16] = 0;
+                time17();
+            }, 40000 - costTime);
+        }
+		if (isExeced[17]) {
+            timeout18 = setTimeout(function () {
+                isExeced[17] = 0;
+                time18();
+            }, 42500 - costTime);
+        }
+		if (isExeced[18]) {
+            timeout19 = setTimeout(function () {
+                isExeced[18] = 0;
+                time19();
+            }, 45000 - costTime);
+        }
+		if (isExeced[19]) {
+            timeout20 = setTimeout(function () {
+                isExeced[19] = 0;
+                time20();
+            }, 47500 - costTime);
+        }
+		if (isExeced[20]) {
+            timeout21 = setTimeout(function () {
+                isExeced[20] = 0;
+                time21();
+            }, 50000 - costTime);
+        }
+		if (isExeced[21]) {
+            timeout22 = setTimeout(function () {
+                isExeced[21] = 0;
+                finished = true;
+                status = 0;
+                time22();
+            }, 52500 - costTime);
+        }
+    }
+
+    function stopTimeout () {
+        costTime += +new Date() - startTime;
+        status = 0;
+
+        clearTimeout(timeout1);
+        clearTimeout(timeout2);
+        clearTimeout(timeout3);
+		clearTimeout(timeout4);
+		clearTimeout(timeout5);
+		clearTimeout(timeout6);
+		clearTimeout(timeout7);
+		clearTimeout(timeout8);
+		clearTimeout(timeout9);
+		clearTimeout(timeout10);
+		clearTimeout(timeout11);
+		clearTimeout(timeout12);
+		clearTimeout(timeout13);
+		clearTimeout(timeout14);
+		clearTimeout(timeout15);
+		clearTimeout(timeout16);
+		clearTimeout(timeout17);
+		clearTimeout(timeout18);
+		clearTimeout(timeout19);
+		clearTimeout(timeout20);
+		clearTimeout(timeout21);
+		clearTimeout(timeout22);
+    }
+
+    function resume () {
+        stopTimeout();
+        reset();
+        timedText();
+    }
+
+    return {
+        start:  timedText,
+        stop:   stopTimeout,
+        resume: resume
+    }
+})();
+
+	function removeAll () {
+		
+		map.removeLayer(path);
+        map.removeLayer(line);
+		map.removeLayer(moorline);
+		map.removeLayer(bakerline);
+		map.removeLayer(districtline);
+		map.removeLayer(bromptonline);
+		map.removeLayer(blackfriarsline);
+		map.removeLayer(kensingtonline);
+		map.removeLayer(aldgateline);
+		map.removeLayer(mansionline);
+		map.removeLayer(ealingline);
+		map.removeLayer(harrowline);
+		map.removeLayer(putneyline);
+		map.removeLayer(towerline);
+		map.removeLayer(hounslowline);
+		map.removeLayer(circleline);
+		map.removeLayer(whitechapelline);
+		map.removeLayer(newcrossline);
+		map.removeLayer(richmondline);
+		map.removeLayer(cheshamline);
+		map.removeLayer(wimbledonline);
+		map.removeLayer(stockwellline);
+		document.getElementById('info').innerHTML= "<button class=\"myButton\" onclick=\"Timer.start();\">Start</button>   <button class=\"myButton\" onclick=\"Timer.stop();\">Stop</button>"
+    }
+
+
+		
+	</script>
+</body>
+</html>
